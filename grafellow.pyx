@@ -2,7 +2,8 @@ from pprint import pprint
 import ujson
 
 class Grafellow(object):
-    def __init__(self, filename=None):
+    def __init__(self, filename=None, testing=None):
+        self.testing = testing
         if filename:
             self.load_graph_from_file(filename)
         self.make_internal_structures()
@@ -10,8 +11,12 @@ class Grafellow(object):
     def add_node(self, node, node_type, attr=None):
         internal_node_id = self.get_node_id(node, node_type)
         if not internal_node_id:
-            internal_node_id = self.new_internal_node_id()
+            internal_node_id = self.assign_internal_node_id(node, node_type)
         self.nodes[internal_node_id] = attr
+
+    def get_node(self, node, node_type):
+        internal_node_id = self.get_node_id(node, node_type)
+        return self.nodes[internal_node_id]
 
     def get_node_id(self, node, node_type):
         """ Note: this area should be replaced at some point with 
@@ -25,7 +30,7 @@ class Grafellow(object):
          The current solution only solves the second part, rather than both,
          which, ideally, it would do.
         """
-        return self.internal_node_names.get((node, node_type), 0)
+        return self.internal_node_ids.get((node, node_type), 0)
 
     def get_internal_node_ids(self, node, node_type):
         pass
@@ -33,8 +38,9 @@ class Grafellow(object):
     def get_internal_node_ids_with_nbunch(self, nbunch):
         pass
     
-    def new_internal_node_id(self):
+    def assign_internal_node_id(self, node, node_type):
         self.last_internal_node_id += 1
+        self.internal_node_ids[(node, node_type)] = self.last_internal_node_id
         return self.last_internal_node_id
     
     """ This section deals with importing data from an api or file """
@@ -58,6 +64,6 @@ class Grafellow(object):
     
     def make_internal_structures(self):
         self.node_types = {}
-        self.internal_node_names = {}
+        self.internal_node_ids = {}
         self.last_internal_node_id = 0
         self.nodes = {}
