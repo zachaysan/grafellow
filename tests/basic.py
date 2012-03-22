@@ -10,3 +10,7 @@ class BasicTest(unittest.TestCase):
         """ it does not blow up on init """
         g = Grafellow()
         self.assertTrue(g)
+        
+    def test_add_node(self):
+        g = Grafellow()
+        g.add_node('zach', 'person')
