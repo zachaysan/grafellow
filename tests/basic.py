@@ -72,3 +72,14 @@ class BasicTest(unittest.TestCase):
 
     def test_retrieving_all_incoming_edges(self):
         pass
+
+    def test_adding_one_million_nodes(self):
+        g = Grafellow()
+        other = {}
+        i = 0
+        node_type = 'test_node'
+        while True:
+            i += 1
+            if i > 1000000:
+                break
+            g.add_node(i,node_type)

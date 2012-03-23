@@ -14,7 +14,10 @@ class Grafellow(object):
     def add_node(self, node, node_type, attr=None):
         if not attr:
             attr = {}
+
+        cdef long internal_node_id
         internal_node_id = self.get_node_id(node, node_type)
+
         if not internal_node_id:
             internal_node_id = self.assign_internal_node_id(node, node_type)
         self.nodes[internal_node_id] = attr
@@ -132,6 +135,8 @@ class Grafellow(object):
         self.node_types = {}
         self.internal_node_ids = {}
         self.external_node_type_tuples = {}
+        cdef long last_internal_node_id
+        self.last_internal_node_id = last_internal_node_id
         self.last_internal_node_id = 0
         self.nodes = {}
         self.non_directed_adj = {}
