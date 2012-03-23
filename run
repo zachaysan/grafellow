@@ -1,3 +1,2 @@
 #!/bin/bash
-python setup.py build_ext --inplace
-python test_grafellow.py
+python setup.py build_ext --inplace && python test_grafellow.py
