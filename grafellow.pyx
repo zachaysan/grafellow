@@ -62,17 +62,26 @@ class Grafellow(object):
         node2_internal_id = self.add_node_if_not_exists(node2, node2_type)
         if node_internal_id not in self.non_directed_adj:
             self.non_directed_adj[node_internal_id] = {}
-        self.non_directed_adj[node_internal_id][node2_internal_id] = attrs
+        self.non_directed_adj[node_internal_id][node2_internal_id] = (edge_type, attrs)
         if node2_internal_id not in self.non_directed_adj:
             self.non_directed_adj[node2_internal_id] = {}
-        self.non_directed_adj[node2_internal_id][node_internal_id] = attrs
+        self.non_directed_adj[node2_internal_id][node_internal_id] = (edge_type, attrs)
         
-    def node_edges(self, node, node_type, other_node_type=None):
+    def node_edges(self, *args, **kwargs):
+        results = [edge for edge in self.node_edges_iter(*args, **kwargs)]
+        if len(results) == 1:
+            return results[0]
+        else:
+            return results
+
+    def node_edges_iter(self, node, node_type, other_node_type=None, edge_types=False):
         node_id = self.get_node_id(node, node_type)
         if not other_node_type:
-            return self.node_edge_tuples(node_id)
+            for result in self.node_edge_tuples(node_id, edge_types=edge_types):
+                yield result
         else:
-            return self.node_edges_of_type(node_id, other_node_type)
+            for result in self.node_edges_of_type(node_id, other_node_type):
+                yield result
 
     def node_edges_of_type(self, node_id, other_node_type):
         pass_function = None
@@ -84,13 +93,21 @@ class Grafellow(object):
             if pass_function(node_type):
                 yield node_id
 
-    def node_edge_tuples(self, node_id):
-        for internal_adj_node_id in self.internal_edges(node_id):
-            yield self.external_node_type_tuples[internal_adj_node_id]
+    def node_edge_tuples(self, node_id, edge_types=False):
+        for internal_adj_node_id, data in self.internal_edges(node_id):
+            node_type_tuple = self.external_node_type_tuples[internal_adj_node_id]
+            if edge_types:
+                edge_type = data[0]
+                node_id = node_type_tuple[0]
+                node_type = node_type_tuple[1]
+                results = (edge_type, node_id, node_type)
+                yield results
+            else:
+                yield node_type_tuple
                 
     def internal_edges(self, node_id):
         for node_internal_id in self.non_directed_adj[node_id]:
-            yield node_internal_id
+            yield (node_internal_id, self.non_directed_adj[node_id][node_internal_id])
 
     """ This section deals with importing data from an api or file """
 
