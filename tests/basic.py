@@ -39,7 +39,14 @@ class BasicTest(unittest.TestCase):
         self.assertTrue(('laura','person') in g.node_edges('zach', 'person'))
 
     def test_retrieving_edge_type(self):
-        pass
+        g = Grafellow(testing=True)
+        g.add_non_directed_edge('zach', 'person', 'laura', 'person',
+                                edge_type='friends')
+        g.add_non_directed_edge('zach', 'person', 'jaco', 'robot',
+                                edge_type='friends')
+        results = g.node_edges('zach', 'person', edge_types=True)
+        self.assertTrue(('friends', 'jaco', 'robot') in results)
+        self.assertTrue(('friends', 'laura', 'person') in results)
     
     def test_retrieving_all_edges(self):
         pass
